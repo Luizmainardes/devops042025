@@ -1,41 +1,56 @@
-Vagrant.configure("2") do |config|     # <== INÍCIO do bloco principal do Vagrant
+Vagrant.configure("2") do |config|  # Início da configuração principal do Vagrant
+
   config.vm.provision "shell", path: "script.sh"
 
-  config.vm.define "controle" do |controle|      # <== INÍCIO da definição da VM "controle"
+  # --- VM CONTROLE ---
+  config.vm.define "controle" do |controle|
     controle.vm.box = "shekeriev/debian-11"
     controle.vm.hostname = "controle-server"
     controle.vm.network "private_network", ip: "172.17.177.100"
-    controle.vm.provider "virtualbox" do |vb|  # <== INÍCIO do bloco de configuração do VirtualBox pra VM "controle"
-      vb.memory = "2048"
+
+    # Configuração do VirtualBox para a VM "controle"
+    controle.vm.provider "virtualbox" do |vb|
+      vb.memory = "4096"
       vb.cpus = 2
       vb.name = "controle"
-    end                                # <== FIM do bloco VirtualBox da VM "controle"
-    controle.vm.provision "ansible_local" do |al|
-      al.playbook = "playbook.yml"
-      al.install_mode = "pip"
-    end                                # <== FIM do bloco ansible VM "controle"
-  end                                  # <== FIM da definição da VM "controle"
+    end
 
-  config.vm.define "web" do |web|      # <== INÍCIO da definição da VM "web"
+    # Mapeamento de pasta compartilhada com o host
+    controle.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+
+    # Provisionamento via Ansible Local
+    controle.vm.provision "ansible_local" do |al|
+      al.playbook = "/vagrant/principal.yml"
+      al.install_mode = "pip"
+    end
+  end
+
+  # --- VM WEB ---
+  config.vm.define "web" do |web|
     web.vm.box = "shekeriev/debian-11"
     web.vm.hostname = "web-server"
     web.vm.network "private_network", ip: "172.17.177.101"
-    web.vm.provider "virtualbox" do |vb|  # <== INÍCIO do bloco de configuração do VirtualBox pra VM "web"
+
+    # Configuração do VirtualBox para a VM "web"
+    web.vm.provider "virtualbox" do |vb|
       vb.memory = "512"
       vb.cpus = 2
       vb.name = "web"
-    end                                # <== FIM do bloco VirtualBox da VM "web"
-  end                                  # <== FIM da definição da VM "web"
+    end
+  end
 
-  config.vm.define "db" do |db|        # <== INÍCIO da definição da VM "db"
+  # --- VM DB ---
+  config.vm.define "db" do |db|
     db.vm.box = "shekeriev/debian-11"
     db.vm.hostname = "db-server"
     db.vm.network "private_network", ip: "172.17.177.102"
-    db.vm.provider "virtualbox" do |vb|  # <== INÍCIO do bloco de configuração do VirtualBox pra VM "db"
+
+    # Configuração do VirtualBox para a VM "db"
+    db.vm.provider "virtualbox" do |vb|
       vb.memory = "512"
       vb.cpus = 2
       vb.name = "db"
-    end                                # <== FIM do bloco VirtualBox da VM "db"
-  end                                  # <== FIM da definição da VM "db"
+    end
+  end
 
-end                                    # <== FIM do bloco principal do Vagrant
+end  # Fim da configuração principal do Vagrant

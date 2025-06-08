@@ -1,0 +1,4 @@
+---
+- import_playbook: installjenkins.yml
+- import_playbook: installdocker.yml
+- import_playbook: playbook.yml

@@ -1,0 +1,44 @@
+---
+- name: Instalação do Jenkins
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Instalar dependências
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg2
+          - openjdk-17-jdk
+          - software-properties-common
+        state: present
+        update_cache: yes
+
+    - name: Baixar chave GPG do Jenkins
+      ansible.builtin.get_url:
+        url: https://pkg.jenkins.io/debian/jenkins.io-2023.key
+        dest: /usr/share/keyrings/jenkins-keyring.asc
+        mode: '0644'
+
+    - name: Adicionar repositório do Jenkins
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+        state: present
+        filename: jenkins
+
+    - name: Atualizar cache de pacotes
+      apt:
+        update_cache: yes
+
+    - name: Instalar Jenkins
+      apt:
+        name: jenkins
+        state: present
+
+    - name: Iniciar e habilitar serviço do Jenkins
+      systemd:
+        name: jenkins
+        state: started
+        enabled: yes
