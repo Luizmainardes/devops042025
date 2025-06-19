@@ -1,6 +1,7 @@
 [web]
-172.17.177.101 ansible_user=vagrant
+172.17.177.101 ansible_user=vagrant 
 
 [db]
-172.17.177.102 ansible_user=vagrant
+172.17.177.102 ansible_user=vagrant 
+
 
